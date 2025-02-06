@@ -1,11 +1,74 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
-    <title>Spring Security Example</title>
+    <meta charset="UTF-8">
+    <title>User</title>
 </head>
 <body>
-<h1>User, welcome spring boot security page!</h1>
 
+<div th:insert="~{main::header}">
+</div>
+
+<div sec:authorize="hasAuthority('ROLE_ADMIN')">
+    <form th:action="@{/admin/users/{id}(id=${user.id})}" th:method="put" th:object="${user}">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+        <label for="id" th:text="'ID: ' + ${user.id}">
+            <input type="hidden" id="id" th:value="*{id}">
+        </label>
+        <br><br>
+
+        <label for="userName">Username:
+            <input type="text" id="userName" name="userName" th:value="*{userName}">
+        </label>
+        <br><br>
+
+        <label for="firstName">First Name:
+            <input type="text" id="firstName" name="firstName" th:value="*{firstName}">
+        </label>
+        <br><br>
+
+        <label for="lastName">Last Name:
+            <input type="text" id="lastName" name="lastName" th:value="*{lastName}">
+        </label>
+        <br><br>
+
+        <label for="birthDate">Birth date:
+            <input type="date" id="birthDate" name="birthDate" th:value="*{birthDate}">
+        </label>
+        <br><br>
+
+        <div th:each="role : ${allRoles}">
+            <input type="checkbox" th:id="${role.value}"
+                   name="roles"  th:value="${role.id}"
+                   th:checked="${#sets.contains(user.roles, role)}">
+            <label th:for="${role.value}" th:text="${role.value}"></label>
+        </div>
+        <br>
+
+        <label for="rawPassword">New password:
+            <input type="hidden" name="password" th:value="${user.password}"/>
+            <input type="password" id="rawPassword" name="rawPassword">
+        </label>
+        <br><br>
+
+        <button type="submit">Записать</button>
+    </form>
+    <br>
+
+    <button onclick="window.location.href = '/admin/users';">Список пользователей</button>
+</div>
+
+<div sec:authorize="!hasAuthority('ROLE_ADMIN')">
+    <p>ID: <span th:text="${user.id}"></span></p>
+    <p>Username: <span th:text="${user.userName}"></span></p>
+    <p>Имя: <span th:text="${user.firstName}"></span></p>
+    <p>Фамилия: <span th:text="${user.lastName}"></span></p>
+    <p>Дата рождения: <span th:text="${user.birthDate}"></span></p>
+    <p>Роли:</p>
+    <ul>
+        <li th:each="role : ${user.roles}" th:text="${role.value}" style="list-style-type: none"></li>
+    </ul>
+</div>
 
 </body>
 </html>
