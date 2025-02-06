@@ -27,7 +27,7 @@ public class Initialization {
         Role roleAdmin = new Role("ROLE_ADMIN");
         Role roleUser = new Role("ROLE_USER");
 
-        User admin = new User("admin", "Ivan", "Ivanov", LocalDate.now(), "admin");
+        User admin = new User("admin", "Ivan", "Ivanov","admin@mail.ru", "admin");
 
 
         if (admin.getPassword() == null || admin.getPassword().isEmpty()) {
@@ -38,7 +38,7 @@ public class Initialization {
         admin.addRole(roleService.add(roleAdmin));
         userService.add(admin);
 
-        User user = new User("user", "Petr", "Petrov", LocalDate.now(), "user");
+        User user = new User("user", "Petr", "Petrov","user@mail.ru", "user");
 
 
         if (user.getPassword() == null || user.getPassword().isEmpty()) {

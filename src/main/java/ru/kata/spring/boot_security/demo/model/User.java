@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 public class User implements UserDetails {
@@ -22,12 +23,11 @@ public class User implements UserDetails {
     @Column(unique = true, nullable = false)
     private String userName;
 
-    private String firstName;
+    private String name;
 
-    private String lastName;
+    private String last_name;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate birthDate;
+    private String email;
 
     private String password;
 
@@ -41,11 +41,11 @@ public class User implements UserDetails {
 
     }
 
-    public User(String userName, String firstName, String lastName, LocalDate birthDate, String password) {
+    public User(String userName, String name, String last_name, String email, String password) {
         this.userName = userName;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.birthDate = birthDate;
+        this.name = name;
+        this.last_name = last_name;
+        this.email = email;
         this.password = password;
     }
 
@@ -73,28 +73,28 @@ public class User implements UserDetails {
         this.userName = userName;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getName() {
+        return name;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getLastName() {
-        return lastName;
+    public String getLast_name() {
+        return last_name;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setLast_name(String last_name) {
+        this.last_name = last_name;
     }
 
-    public LocalDate getBirthDate() {
-        return birthDate;
+    public String getEmail() {
+        return email;
     }
 
-    public void setBirthDate(LocalDate birthDate) {
-        this.birthDate = birthDate;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPassword() {
@@ -149,9 +149,9 @@ public class User implements UserDetails {
         return "User{" +
                 "id=" + id +
                 ", userName='" + userName + '\'' +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", birthDate=" + birthDate +
+                ", name='" + name + '\'' +
+                ", last_name='" + last_name + '\'' +
+                ", email='" + email + '\'' +
                 '}';
     }
 

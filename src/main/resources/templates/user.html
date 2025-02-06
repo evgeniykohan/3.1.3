@@ -22,18 +22,18 @@
         </label>
         <br><br>
 
-        <label for="firstName">First Name:
-            <input type="text" id="firstName" name="firstName" th:value="*{firstName}">
+        <label for="name">name:
+            <input type="text" id="name" name="name" th:value="*{name}">
         </label>
         <br><br>
 
-        <label for="lastName">Last Name:
-            <input type="text" id="lastName" name="lastName" th:value="*{lastName}">
+        <label for="last_name">Last_name:
+            <input type="text" id="last_name" name="last_name" th:value="*{last_name}">
         </label>
         <br><br>
 
-        <label for="birthDate">Birth date:
-            <input type="date" id="birthDate" name="birthDate" th:value="*{birthDate}">
+        <label for="email">email:
+            <input type="text" id="email" name="email" th:value="*{email}">
         </label>
         <br><br>
 
@@ -61,9 +61,9 @@
 <div sec:authorize="!hasAuthority('ROLE_ADMIN')">
     <p>ID: <span th:text="${user.id}"></span></p>
     <p>Username: <span th:text="${user.userName}"></span></p>
-    <p>Имя: <span th:text="${user.firstName}"></span></p>
-    <p>Фамилия: <span th:text="${user.lastName}"></span></p>
-    <p>Дата рождения: <span th:text="${user.birthDate}"></span></p>
+    <p>Имя: <span th:text="${user.name}"></span></p>
+    <p>Фамилия: <span th:text="${user.last_name}"></span></p>
+    <p>Почта: <span th:text="${user.email}"></span></p>
     <p>Роли:</p>
     <ul>
         <li th:each="role : ${user.roles}" th:text="${role.value}" style="list-style-type: none"></li>

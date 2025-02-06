@@ -13,7 +13,7 @@
             <th>Username</th>
             <th>Имя</th>
             <th>Фамилия</th>
-            <th>Дата рождения</th>
+            <th>Почта</th>
             <th>Пароль</th>
             <th>Роли</th>
             <th>Действие</th>
@@ -21,9 +21,9 @@
         <tr th:each="user : ${users}">
             <td th:text="${user.id}"></td>
             <td th:text="${user.userName}"></td>
-            <td th:text="${user.firstName}"></td>
-            <td th:text="${user.lastName}"></td>
-            <td th:text="${user.birthDate}"></td>
+            <td th:text="${user.name}"></td>
+            <td th:text="${user.last_name}"></td>
+            <td th:text="${user.email}"></td>
             <td><span>********</span></td>
             <td>
                 <ul>
@@ -48,13 +48,13 @@
                     <input type="text" name="userName">
                 </td>
                 <td>
-                    <input type="text" name="firstName">
+                    <input type="text" name="name">
                 </td>
                 <td>
-                    <input type="text" name="lastName">
+                    <input type="text" name="last_name">
                 </td>
                 <td>
-                    <input type="date" name="birthDate">
+                    <input type="text" name="email">
                 </td>
                 <td>
                     <input type="password" name="rawPassword">
