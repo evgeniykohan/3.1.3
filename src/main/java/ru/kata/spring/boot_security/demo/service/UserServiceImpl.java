@@ -17,6 +17,7 @@ import ru.kata.spring.boot_security.demo.repositories.UserRepository;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -35,12 +36,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username);
-        if (user == null) {
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isEmpty()) {
             throw new UsernameNotFoundException("User not found");
         }
-        return user;
+        return user.get();
     }
 
     @Override
@@ -77,20 +78,25 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public User oneUserInfo() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetails userService = (UserDetails) authentication.getPrincipal();
         return (User) authentication.getPrincipal();
     }
 
     @Override
     @Transactional
-    public void updateUser(Long id, User user) {
+    public void updateUser(Long id, User user, String password, Set<Role> roles) {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User  not found"));
-        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
-            existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        if (password != null && !password.isEmpty()) {
+            existingUser.setPassword(passwordEncoder.encode(password));
         }
         existingUser.setUsername(user.getUsername());
+        existingUser.setLastName(user.getLastName());
+        existingUser.setAge(user.getAge());
         existingUser.setEmail(user.getEmail());
+        if (roles != null) {
+            existingUser.setRoles(roles);
+        }
         userRepository.save(existingUser);
     }
 
@@ -98,5 +104,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Transactional
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
+    }
+
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username);
     }
 }

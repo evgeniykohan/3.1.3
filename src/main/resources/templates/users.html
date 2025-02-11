@@ -2,60 +2,263 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Users list</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <style>
-        .button {
-            display: inline-block;
-            padding: 5px 10px;
-            font-size: 14px;
-            color: white;
-            background-color: #5e9c7f;
-            border: none;
-            border-radius: 5px;
-            text-decoration: none;
-            cursor: pointer;
+        body {
+            display: flex;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
         }
-        .button_delete {
-            display: inline-block;
-            padding: 5px 10px;
-            font-size: 14px;
-            color: white;
-            background-color: #ff0000;
-            border: none;
-            border-radius: 5px;
-            text-decoration: none;
-            cursor: pointer;
+
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+            width: calc(100% - 250px);
+            margin-top: 56px;
         }
+
+        .table-container {
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .table {
+            width: 100%;
+        }
+
+        .nav {
+            margin-top: 56px;
+        }
+
+        .nav-tabs {
+            margin-top: 10px;
+        }
+
     </style>
 </head>
 <body>
-<h1>Users list</h1>
-<br>
-<table class="table table-dark">
-    <thead>
-    <tr>
-        <th scope="col">ID</th>
-        <th scope="col">Username</th>
-        <th scope="col">Email</th>
-        <th scope="col">Actions</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="user : ${users}">
-        <td th:text="${user.id}"></td>
-        <td th:text="${user.username}"></td>
-        <td th:text="${user.email}"></td>
-        <td>
-            <a th:href="@{/admin/edit(id=${user.id})}" class="button">Update</a>
-            <a th:href="@{/admin/delete(id=${user.id})}" class="button_delete">Delete</a>
-        </td>
-    </tr>
-    </tbody>
-</table>
-<br>
-<a href="/admin/new" class="button">Create new user</a>
-<br> <br>
-<a href="/logout" class="button">Logout</a>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" th:text="${currentUser.email} + ' with role ' + ${currentUser.getRoles()}">Admin
+            Panel</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/logout">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="d-flex align-items-start">
+    <div class="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+        <a class="nav-link active" id="v-pills-home-tab" data-bs-toggle="pill" href="#v-pills-home" role="tab"
+           aria-controls="v-pills-home" aria-selected="true">Admin</a>
+        <a class="nav-link" id="v-pills-profile-tab" href="/admin/user" role="tab"
+           aria-controls="v-pills-profile" aria-selected="false">User</a>
+    </div>
+    <div class="flex-grow-1" id="v-pills-tabContent">
+        <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab">
+            <div class="content">
+                <h1>Admin panel</h1>
+                <nav class="nav nav-tabs" id="nav-tab" role="tablist">
+                    <a class="nav-link active" id="nav-users-tab" data-bs-toggle="tab" href="#nav-users" role="tab"
+                       aria-controls="nav-users" aria-selected="true">Users table</a>
+                    <a class="nav-link" id="nav-new-user-tab" href="/admin/new" role="tab"
+                       aria-controls="nav-new-user" aria-selected="false">New user</a>
+                </nav>
+                <div class="tab-content" id="nav-tabContent">
+                    <div class="tab-pane fade show active" id="nav-users" role="tabpanel"
+                         aria-labelledby="nav-users-tab">
+                        <div class="table-container">
+                            <table class="table table-light">
+                                <thead>
+                                <tr>
+                                    <th colspan="3" class="text-left">All users</th>
+                                </tr>
+                                <tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">First Name</th>
+                                    <th scope="col">Last Name</th>
+                                    <th scope="col">Age</th>
+                                    <th scope="col">Email</th>
+                                    <th scope="col">Role</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="user : ${users}">
+                                    <td th:text="${user.id}"></td>
+                                    <td th:text="${user.username}"></td>
+                                    <td th:text="${user.lastName}"></td>
+                                    <td th:text="${user.age}"></td>
+                                    <td th:text="${user.email}"></td>
+                                    <td th:text="${user.roles}"></td>
+                                    <td>
+                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                                data-bs-target="#editUserModal"
+                                                th:data-id="${user.id}"
+                                                th:data-username="${user.username}"
+                                                th:data-lastName="${user.lastName}"
+                                                th:data-age="${user.age}"
+                                                th:data-email="${user.email}"
+                                                onclick="setUserData(this)">Edit
+                                        </button>
+                                        <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                                                data-bs-target="#deleteUserModal"
+                                                th:data-id="${user.id}"
+                                                th:data-username="${user.username}"
+                                                th:data-lastName="${user.lastName}"
+                                                th:data-age="${user.age}"
+                                                th:data-email="${user.email}"
+                                                onclick="setDeleteUserId(this)">Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">Lorem,
+            ipsum dolor sit amet consectetur adipisicing elit. Id ducimus veniam optio porro impedit amet odio aliquam
+            officia non nobis quisquam soluta repudiandae, earum nulla.
+        </div>
+    </div>
+</div>
+
+<!-- Modal для редактирования пользователя -->
+<div class="modal" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editUserLabel">Update User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form th:action="@{/admin/update}" method="post">
+                <div class="modal-body">
+                    <input type="hidden" id="editUserId" name="id">
+                    <div class="mb-3">
+                        <label for="editUsername" class="form-label">First Name</label>
+                        <input type="text" class="form-control" id="editUsername" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editLastName" class="form-label">Last Name</label>
+                        <input type="text" class="form-control" id="editLastName" name="lastName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editAge" class="form-label">Age</label>
+                        <input type="number" class="form-control" id="editAge" name="age" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="editEmail" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editPassword" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="editPassword" name="password">
+                    </div>
+                    <div class="mb-3">
+                        <label for="roles">Role</label>
+                        <select name="role" class="form-control form-control-sm" multiple id="roles"
+                                style="height: 60px;">
+                            <option value="1">Admin</option>
+                            <option value="2">User</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для подтверждения удаления -->
+<div class="modal" id="deleteUserModal" tabindex="-1" role="dialog" aria-labelledby="deleteUserLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteUserLabel">Delete user</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form th:action="@{/admin/delete}" method="get">
+                <div class="modal-body">
+                    <input type="hidden" id="deleteUserId" name="id">
+                    <div class="mb-3">
+                        <label for="deleteUsername" class="form-label">First name</label>
+                        <input type="text" class="form-control" id="deleteUsername" name="username" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="deleteLastName" class="form-label">Last name</label>
+                        <input type="text" class="form-control" id="deleteLastName" name="lastName" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="deleteAge" class="form-label">Age</label>
+                        <input type="number" class="form-control" id="deleteAge" name="age" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="deleteEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="deleteEmail" name="email" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="deletePassword" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="deletePassword" name="password" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="roles">Role</label>
+                        <select name="role" class="form-control form-control-sm" multiple id="deleteRoles"
+                                style="height: 60px;" readonly>
+                            <option value="1">Admin</option>
+                            <option value="2">User</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function setUserData(element) {
+        document.getElementById('editUserId').value = element.getAttribute('data-id');
+        document.getElementById('editUsername').value = element.getAttribute('data-username');
+        document.getElementById('editLastName').value = element.getAttribute('data-lastName');
+        document.getElementById('editAge').value = element.getAttribute('data-age');
+        document.getElementById('editEmail').value = element.getAttribute('data-email');
+    }
+
+    function setDeleteUserId(element) {
+        document.getElementById('deleteUserId').value = element.getAttribute('data-id');
+        document.getElementById('deleteUsername').value = element.getAttribute('data-username');
+        document.getElementById('deleteLastName').value = element.getAttribute('data-lastName');
+        document.getElementById('deleteAge').value = element.getAttribute('data-age');
+        document.getElementById('deleteEmail').value = element.getAttribute('data-email');
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+
 </body>
 </html>
