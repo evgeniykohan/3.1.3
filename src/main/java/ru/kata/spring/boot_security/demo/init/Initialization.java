@@ -1,53 +1,61 @@
 package ru.kata.spring.boot_security.demo.init;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
-import ru.kata.spring.boot_security.demo.service.RoleService;
-import ru.kata.spring.boot_security.demo.service.UserService;
+import ru.kata.spring.boot_security.demo.repositories.RoleRepository;
+import ru.kata.spring.boot_security.demo.repositories.UserRepository;
 
-import javax.annotation.PostConstruct;
-import java.time.LocalDate;
+import java.util.Optional;
 
 @Component
-public class Initialization {
-    private final RoleService roleService;
-    private final UserService userService;
+public class Initialization implements CommandLineRunner {
+    private UserRepository userRepository;
+
+    private RoleRepository roleRepository;
+
     private final PasswordEncoder passwordEncoder;
 
-    public Initialization(RoleService roleService, UserService userService, PasswordEncoder passwordEncoder) {
-        this.roleService = roleService;
-        this.userService = userService;
+    @Autowired
+    public Initialization(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
-    @PostConstruct
-    private void Db() {
-        Role roleAdmin = new Role("ROLE_ADMIN");
-        Role roleUser = new Role("ROLE_USER");
+    @Override
+    public void run(String... args) throws Exception {
 
-        User admin = new User("admin", "Ivan", "Ivanov","admin@mail.ru", "admin");
+        Role adminRole = createRoleIfNotExists("ROLE_ADMIN");
+        Role userRole = createRoleIfNotExists("ROLE_USER");
 
+        createUserIfNotExists("admin", "admin", adminRole);
+        createUserIfNotExists("user", "user", userRole);
+    }
 
-        if (admin.getPassword() == null || admin.getPassword().isEmpty()) {
-            throw new IllegalArgumentException("Admin password cannot be null or empty");
+    private Role createRoleIfNotExists(String roleName) {
+        Optional<Role> existingRole = roleRepository.findByName(roleName);
+        if (existingRole.isPresent()) {
+            return existingRole.get();
+        } else {
+            Role newRole = new Role();
+            newRole.setName(roleName);
+            return roleRepository.save(newRole);
         }
+    }
 
-        admin.setPassword(passwordEncoder.encode(admin.getPassword()));
-        admin.addRole(roleService.add(roleAdmin));
-        userService.add(admin);
-
-        User user = new User("user", "Petr", "Petrov","user@mail.ru", "user");
-
-
-        if (user.getPassword() == null || user.getPassword().isEmpty()) {
-            throw new IllegalArgumentException("User password cannot be null or empty");
+    private void createUserIfNotExists(String username, String password, Role role) {
+        if (!userRepository.existsByUsername(username)) {
+            System.out.println("Creating user: " + username);
+            User user = new User();
+            user.setUsername(username);
+            user.setPassword(passwordEncoder.encode(password));
+            user.getRoles().add(role);
+            userRepository.save(user);
         }
-
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.addRole(roleService.add(roleUser));
-        userService.add(user);
     }
 }
 

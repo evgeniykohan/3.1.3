@@ -1,65 +1,59 @@
 package ru.kata.spring.boot_security.demo.controllers;
 
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
+import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
-import ru.kata.spring.boot_security.demo.service.RoleService;
+import ru.kata.spring.boot_security.demo.repositories.RoleRepository;
 import ru.kata.spring.boot_security.demo.service.UserService;
+
+import java.util.Set;
 
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
 
-    private final UserService userService;
-    private final RoleService roleService;
+    @Autowired
+    private UserService userService;
 
-    public AdminController(UserService userService, RoleService roleService) {
-        this.userService = userService;
-        this.roleService = roleService;
-    }
+    @Autowired
+    private RoleRepository roleRepository;
 
     @GetMapping
-    public String redirectToAdmin() {
-        return "admin";
-    }
-
-    @GetMapping("/users")
-    public String findAllUsers(Model model) {
-        model.addAttribute("users", userService.findAll());
-        model.addAttribute("allRoles", roleService.findAll());
+    public String getUsers(Model model) {
+        model.addAttribute("users", userService.findAllUsers());
         return "users";
     }
 
-    @GetMapping("/users/{id}")
-    public String findUserById(Model model, @PathVariable Long id) {
-        model.addAttribute("user", userService.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
-        model.addAttribute("allRoles", roleService.findAll());
-        return "user";
+    @GetMapping(value = "/new")
+    public String newUser(Model model) {
+        model.addAttribute("user", new User());
+        return "newUser";
     }
 
-    @PostMapping("/users")
-    public String addUser(@ModelAttribute User user) {
-        userService.add(user);
-        return "redirect:/admin/users";
+    @PostMapping("/new")
+    public String createUser(@ModelAttribute User user, @RequestParam(value = "role") Set<Role> roles) {
+        userService.saveUser(userService.createUser(user, roles));
+        return "redirect:/admin/";
     }
 
-    @DeleteMapping("/users/{id}")
-    public String deleteUser(@PathVariable Long id) {
-        if (!userService.removeById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-        return "redirect:/admin/users";
+    @GetMapping(value = "/edit")
+    public String edit(@RequestParam(value = "id") long id, Model model) {
+        model.addAttribute("user", userService.getOne(id));
+        return "editUser";
     }
 
-    @PutMapping("/users/{id}")
-    public String updateUser(User user) {
-        if (!userService.update(user)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-        return "redirect:/admin/users";
+    @PostMapping(value = "/update")
+    public String update(@ModelAttribute("user") User user, @RequestParam("id") Long id) {
+        userService.updateUser(id, user);
+        return "redirect:/admin";
+    }
+
+    @GetMapping(value = "/delete")
+    public String delete(@RequestParam("id") Long id) {
+        userService.deleteUser(id);
+        return "redirect:/admin";
     }
 }
