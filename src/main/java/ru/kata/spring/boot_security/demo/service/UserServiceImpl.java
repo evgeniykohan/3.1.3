@@ -12,10 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
-import ru.kata.spring.boot_security.demo.repositories.RoleRepository;
 import ru.kata.spring.boot_security.demo.repositories.UserRepository;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -24,13 +22,13 @@ import java.util.Set;
 @Transactional(readOnly = true)
 public class UserServiceImpl implements UserService, UserDetailsService {
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     @Lazy
-    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
@@ -57,17 +55,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     @Transactional
-    public User createUser(User user, Set<Role> roles) {
+    public void createUser(User user, Set<Role> roles) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        Set<Role> roleSet = new HashSet<>();
-        for (Role role : roles) {
-            Role newRole = role;
-            if (newRole != null) {
-                roleSet.add(newRole);
-            }
-        }
-        user.setRoles(roleSet);
-        return user;
+        user.setRoles(roles);
+        userRepository.save(user);
     }
 
     @Override

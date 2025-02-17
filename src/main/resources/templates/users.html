@@ -1,144 +1,160 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Users list</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <title>Admin page</title>
     <style>
+        .sidebar {
+            position: fixed;
+            top: 60px;
+            bottom: 0;
+            left: 0;
+            width: 200px;
+            background-color: white;
+            padding: 10px;
+        }
+
         body {
-            display: flex;
-            margin: 0;
-            padding: 0;
-            height: 100vh;
+            background-color: #f8f9fa;
+            margin-left: 200px;
+            margin-right: 50px;
+            margin-top: 60px;
         }
 
-        .content {
-            margin-left: 250px;
+        .container-fluid {
+            background-color: white;
+            margin-left: 20px;
+            margin-right: 20px;
             padding: 20px;
-            width: calc(100% - 250px);
-            margin-top: 56px;
         }
 
-        .table-container {
-            margin-top: 20px;
-            width: 100%;
+        .table thead th {
+            border-top: 2px solid #d3d3d3;
         }
 
-        .table {
-            width: 100%;
+        .btn-secondary {
+            background-color: lightcoral;
+            color: black;
         }
 
-        .nav {
-            margin-top: 56px;
+        .btn-secondary.active {
+            background-color: white;
+            color: blue;
         }
 
-        .nav-tabs {
-            margin-top: 10px;
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
+        .form-group label {
+            font-weight: bold;
+        }
+
+        .form-control {
+            width: 80%;
+        }
     </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-    <div class="container-fluid">
-        <a class="navbar-brand" th:text="${currentUser.email} + ' with role ' + ${currentUser.getRoles()}">Admin
-            Panel</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/logout">Logout</a>
-                </li>
-            </ul>
-        </div>
+<!-- Fixed top navigation bar -->
+<div class="fixed-top bg-dark text-white d-flex justify-content-between align-items-center"
+     style="font-size: 24px; padding: 10px;">
+    <!-- Левый блок: email и роли -->
+    <div class="d-flex align-items-center">
+        <span th:text="${currentUser.email} + ' with roles : '"></span>
+        <span th:each="role, iterStat : ${currentUser.roles}">
+            <span th:text="${#strings.substringAfter(role.name, 'ROLE_')}"></span>
+            <span th:if="${!iterStat.last}">, </span>
+        </span>
     </div>
-</nav>
 
-<div class="d-flex align-items-start">
-    <div class="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-        <a class="nav-link active" id="v-pills-home-tab" data-bs-toggle="pill" href="#v-pills-home" role="tab"
-           aria-controls="v-pills-home" aria-selected="true">Admin</a>
-        <a class="nav-link" id="v-pills-profile-tab" href="/admin/user" role="tab"
-           aria-controls="v-pills-profile" aria-selected="false">User</a>
+    <!-- Правый блок: кнопка Logout -->
+    <form th:action="@{/logout}" th:method="POST" class="mb-0">
+        <button type="submit" class="btn btn-link text-white">Logout</button>
+    </form>
+</div>
+
+<!-- Sidebar navigation -->
+<div class="sidebar">
+    <ul class="list-unstyled">
+        <div class="btn-group-vertical" role="group" aria-label="Basic example" style="width: 100%;">
+            <a href="/admin/user" class="btn btn-light" role="button">User</a>
+            <a href="/admin/" class="btn btn-primary active" role="button"
+               style="background-color: #007BFF; border-color: #007BFF;">Admin</a>
+        </div>
+    </ul>
+</div>
+
+<!-- Main content -->
+<div class="content">
+    <h2 style="margin-left: 20px; margin-top: 80px">Admin panel</h2>
+    <div class="btn-group btn-group-sm" role="group" style="margin-left: 20px">
+        <a href="/admin/user" class="btn btn-secondary active"
+           style="background-color: #007BFF; color: white; border: none;">Users table</a>
+        <a href="/admin/new" class="btn btn-secondary" style="background-color: #f8f9fa; color: black; border: none;">New
+            User</a>
     </div>
-    <div class="flex-grow-1" id="v-pills-tabContent">
-        <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab">
-            <div class="content">
-                <h1>Admin panel</h1>
-                <nav class="nav nav-tabs" id="nav-tab" role="tablist">
-                    <a class="nav-link active" id="nav-users-tab" data-bs-toggle="tab" href="#nav-users" role="tab"
-                       aria-controls="nav-users" aria-selected="true">Users table</a>
-                    <a class="nav-link" id="nav-new-user-tab" href="/admin/new" role="tab"
-                       aria-controls="nav-new-user" aria-selected="false">New user</a>
-                </nav>
-                <div class="tab-content" id="nav-tabContent">
-                    <div class="tab-pane fade show active" id="nav-users" role="tabpanel"
-                         aria-labelledby="nav-users-tab">
-                        <div class="table-container">
-                            <table class="table table-light">
-                                <thead>
-                                <tr>
-                                    <th colspan="3" class="text-left">All users</th>
-                                </tr>
-                                <tr>
-                                    <th scope="col">ID</th>
-                                    <th scope="col">First Name</th>
-                                    <th scope="col">Last Name</th>
-                                    <th scope="col">Age</th>
-                                    <th scope="col">Email</th>
-                                    <th scope="col">Role</th>
-                                    <th scope="col">Actions</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr th:each="user : ${users}">
-                                    <td th:text="${user.id}"></td>
-                                    <td th:text="${user.username}"></td>
-                                    <td th:text="${user.lastName}"></td>
-                                    <td th:text="${user.age}"></td>
-                                    <td th:text="${user.email}"></td>
-                                    <td th:text="${user.roles}"></td>
-                                    <td>
-                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                                data-bs-target="#editUserModal"
-                                                th:data-id="${user.id}"
-                                                th:data-username="${user.username}"
-                                                th:data-lastName="${user.lastName}"
-                                                th:data-age="${user.age}"
-                                                th:data-email="${user.email}"
-                                                onclick="setUserData(this)">Edit
-                                        </button>
-                                        <button type="button" class="btn btn-danger" data-bs-toggle="modal"
-                                                data-bs-target="#deleteUserModal"
-                                                th:data-id="${user.id}"
-                                                th:data-username="${user.username}"
-                                                th:data-lastName="${user.lastName}"
-                                                th:data-age="${user.age}"
-                                                th:data-email="${user.email}"
-                                                onclick="setDeleteUserId(this)">Delete
-                                        </button>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="tab-pane fade" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">Lorem,
-            ipsum dolor sit amet consectetur adipisicing elit. Id ducimus veniam optio porro impedit amet odio aliquam
-            officia non nobis quisquam soluta repudiandae, earum nulla.
-        </div>
+    <div class="container-fluid">
+        <h5>All users</h5>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Age</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Edit</th>
+                <th>Delete</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="user : ${users}">
+                <td th:text="${user.id}"></td>
+                <td th:text="${user.username}"></td>
+                <td th:text="${user.lastName}"></td>
+                <td th:text="${user.age}"></td>
+                <td th:text="${user.email}"></td>
+                <td th:text="${user.roles}"></td>
+                <td>
+                    <button type="button" class="btn btn-info" data-bs-toggle="modal"
+                            data-bs-target="#editUserModal"
+                            th:data-id="${user.id}"
+                            th:data-username="${user.username}"
+                            th:data-lastName="${user.lastName}"
+                            th:data-age="${user.age}"
+                            th:data-email="${user.email}"
+                            onclick="setUserData(this)">Edit
+                    </button>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                            data-bs-target="#deleteUserModal"
+                            th:data-id="${user.id}"
+                            th:data-username="${user.username}"
+                            th:data-lastName="${user.lastName}"
+                            th:data-age="${user.age}"
+                            th:data-email="${user.email}"
+                            onclick="setDeleteUserId(this)">Delete
+                    </button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
     </div>
 </div>
 
-<!-- Modal для редактирования пользователя -->
+<!-- Modal for editing user -->
 <div class="modal" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -166,10 +182,6 @@
                         <input type="email" class="form-control" id="editEmail" name="email" required>
                     </div>
                     <div class="mb-3">
-                        <label for="editPassword" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="editPassword" name="password">
-                    </div>
-                    <div class="mb-3">
                         <label for="roles">Role</label>
                         <select name="role" class="form-control form-control-sm" multiple id="roles"
                                 style="height: 60px;">
@@ -187,7 +199,7 @@
     </div>
 </div>
 
-<!-- Модальное окно для подтверждения удаления -->
+<!-- Modal for deleting user -->
 <div class="modal" id="deleteUserModal" tabindex="-1" role="dialog" aria-labelledby="deleteUserLabel"
      aria-hidden="true">
     <div class="modal-dialog">
@@ -216,10 +228,6 @@
                         <input type="email" class="form-control" id="deleteEmail" name="email" readonly>
                     </div>
                     <div class="mb-3">
-                        <label for="deletePassword" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="deletePassword" name="password" readonly>
-                    </div>
-                    <div class="mb-3">
                         <label for="roles">Role</label>
                         <select name="role" class="form-control form-control-sm" multiple id="deleteRoles"
                                 style="height: 60px;" readonly>
@@ -236,7 +244,6 @@
         </div>
     </div>
 </div>
-
 
 <script>
     function setUserData(element) {
@@ -256,9 +263,9 @@
     }
 </script>
 
+<!-- Bootstrap Bundle with Popper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
         crossorigin="anonymous"></script>
-
 </body>
 </html>

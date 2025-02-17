@@ -11,7 +11,7 @@ public interface UserService {
 
     void saveUser(User user);
 
-    User createUser(User user, Set<Role> roles);
+    void createUser(User user, Set<Role> roles);
 
     User getOne(long id);
 

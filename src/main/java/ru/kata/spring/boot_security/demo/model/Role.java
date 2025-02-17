@@ -1,8 +1,10 @@
+
 package ru.kata.spring.boot_security.demo.model;
 
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 @Table(name = "roles")
@@ -17,8 +19,8 @@ public class Role implements GrantedAuthority {
     public Role() {
     }
 
-    public Role(Long id) {
-        this.id = id;
+    public Role(String roleName) {
+        this.name = roleName;
     }
 
     public Role(Long id, String name) {

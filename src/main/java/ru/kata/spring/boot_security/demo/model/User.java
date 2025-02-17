@@ -35,12 +35,13 @@ public class User implements UserDetails {
     public User() {
     }
 
-    public User(String username, String lastName, Integer age, String password, String email) {
+    public User(Set<Role> roles, String username, String lastName, Integer age, String password, String email) {
         this.username = username;
         this.lastName = lastName;
         this.age = age;
         this.password = password;
         this.email = email;
+        this.roles = roles;
     }
 
     public Long getId() {
@@ -121,7 +122,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return getRoles();
+        return roles;
     }
 
     @Override
